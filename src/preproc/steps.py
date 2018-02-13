@@ -1,5 +1,7 @@
 import numpy as np
 
+from preproc.errors import PreprocessingError
+
 
 class Step(object):
     def __init__(self):
@@ -40,9 +42,15 @@ class SubtractAvg(Step):
         self.n = 0
         self.fitted = False
 
+    def _check_not_fitted(self):
+        if self.fitted:
+            raise PreprocessingError('Step already fitted')
+
+
     def _calc_avg(self):
-        if self.n == 0 or self.fitted:
-            raise RuntimeError
+        self._check_not_fitted()
+        if self.n == 0:
+            raise PreprocessingError('No data points to average')
         self.avg /= self.n
         self.fitted = True
 
@@ -52,6 +60,7 @@ class SubtractAvg(Step):
         return data - self.avg
 
     def fit(self, data):
+        self._check_not_fitted()
         data = np.array(data)
         if self.avg is None:
             self.avg = np.zeros(data.shape[1])
