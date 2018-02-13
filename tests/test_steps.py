@@ -1,7 +1,8 @@
 import numpy as np
 
-from pytest import mark
+from pytest import mark, raises
 
+from preproc.errors import PreprocessingError
 from preproc import steps
 
 
@@ -30,3 +31,9 @@ class TestStep(object):
         step = stepclass(*args, **kwds)
         step.fit(fit_data)
         assert np.allclose(step.transform(data), expected)
+
+    def test_fitted(self):
+        step = steps.SubtractAvg()
+        step.fit([[1, 2, 0], [4, 5, 6]])
+        with raises(PreprocessingError):
+            step.fit([[1, 2, 0], [4, 5, 6]])
