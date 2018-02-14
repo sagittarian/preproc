@@ -8,6 +8,11 @@ from preproc.preprocess import Preprocess
 from preproc.serialize import version
 
 
+@version(steps.Log.version+1, handles=[('Log', 1, None)])
+class Log2(steps.Log):
+    pass
+
+
 class TestSerialize(object):
     @pytest.mark.parametrize('cls,args', [
         (steps.Log, ()),
@@ -66,3 +71,13 @@ class TestSerialize(object):
                                        deserialized.steps):
             assert isinstance(newstep, type(origstep))
 
+    def test_upgrade_step(self):
+        orig = steps.Log()
+        data = orig.serialize()
+        oldver = steps.Log.version
+        newver = Log2.version
+        assert data['version'] == oldver
+
+        deserialized = version.deserialize(data)
+        assert isinstance(deserialized, Log2)
+        assert deserialized.version == newver
