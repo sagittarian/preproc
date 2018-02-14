@@ -1,5 +1,6 @@
 import numpy as np
 
+from preproc.serialize import Serializable, version
 from preproc.errors import PreprocessingError
 
 
@@ -32,14 +33,16 @@ class Step(object):
         raise NotImplementedError
 
 
-class Log(Step):
+@version(1)
+class Log(Step, Serializable):
     """Step to take the natural logarithm of the data points."""
 
     def transform(self, data):
         return np.log(data)
 
 
-class Diff(Step):
+@version(1)
+class Diff(Step, Serializable):
     """Step to take the difference between successive columns.
 
     The resulting preprocessed data will have one fewer column than the
@@ -51,7 +54,8 @@ class Diff(Step):
         return np.diff(data, axis=1)
 
 
-class SelectWavelengths(Step):
+@version(1)
+class SelectWavelengths(Step, Serializable):
     """Step to select specific columns in the input data.
 
     The columns selected are controlled by the from_ and to parameters
@@ -64,6 +68,8 @@ class SelectWavelengths(Step):
 
     """
 
+    attributes = ('from_', 'to')
+
     def __init__(self, from_, to):
         self.from_ = from_
         self.to = to
@@ -72,7 +78,8 @@ class SelectWavelengths(Step):
         return np.array(data)[:, self.from_ : self.to+1]
 
 
-class SubtractAvg(Step):
+@version(1)
+class SubtractAvg(Step, Serializable):
     """Step to calculate average of each column and subtract it from the
     data to be preprocessed.
 
@@ -81,6 +88,8 @@ class SubtractAvg(Step):
     subtracted from each column.
 
     """
+
+    attributes = ('avg', 'n', 'fitted')
 
     def __init__(self):
         self.avg = None
@@ -111,3 +120,19 @@ class SubtractAvg(Step):
         self.avg += np.sum(data, axis=0)
         self.n += data.shape[0]
         return data
+
+    @classmethod
+    def deserialize(cls, data, version):
+        """Recreate the instance from the serialization data.
+
+        The state information regarding the average needs to be restored
+        after the instance is created.
+
+        """
+
+        instance = cls()
+        attrs = data['attributes']
+        instance.avg = np.array(attrs['avg'])
+        instance.n = attrs['n']
+        instance.fitted = attrs['fitted']
+        return instance

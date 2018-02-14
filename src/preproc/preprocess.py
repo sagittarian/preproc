@@ -1,9 +1,11 @@
 import numpy as np
 
+from preproc.serialize import Serializable, version
 from preproc.errors import PreprocessingError
 
 
-class Preprocess(object):
+@version(1)
+class Preprocess(Serializable):
     """Class to encapsulate the preprocessing pipeline with variable steps.
 
     A Preprocess object encapsulates the preprocessing pipeline.  Steps
@@ -19,6 +21,8 @@ class Preprocess(object):
     after the parameters have been learned.
 
     """
+
+    attributes = ('steps', 'fitted')
 
     def __init__(self, steps=()):
         """Create a new preprocessing pipeline.
@@ -80,3 +84,11 @@ class Preprocess(object):
         for step in self.steps:
             data = step.transform(data)
         return data
+
+    @classmethod
+    def deserialize(cls, data, version):
+        attrs = data['attributes']
+        steps = [version.deserialize(item) for item in attrs['steps']]
+        instance = cls(steps)
+        instance.fitted = attrs['fitted']
+        return instance
