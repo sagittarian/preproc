@@ -39,3 +39,12 @@ class TestStep(object):
         result = step.transform(data)
         with raises(PreprocessingError):
             step.fit(data)
+
+    def test_fit_no_data_subtractavg(self):
+        step = steps.SubtractAvg()
+        step.fit([])
+
+    def test_transform_no_data_subtractavg(self):
+        step = steps.SubtractAvg()
+        with raises(PreprocessingError):
+            step.transform([])

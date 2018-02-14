@@ -105,7 +105,7 @@ class SubtractAvg(Step):
 
     def fit(self, data):
         self._check_not_fitted()
-        data = np.array(data)
+        data = np.atleast_2d(data)
         if self.avg is None:
             self.avg = np.zeros(data.shape[1])
         self.avg += np.sum(data, axis=0)
