@@ -20,9 +20,15 @@ class Step(object):
         return self.transform(data)
 
     def fit(self, data):
-        return self.transform(data)
+        """Learn any parameters that need to be learned from the given data.
+
+        Returns: the unchanged data
+
+        """
+        return data
 
     def transform(self, data):
+        """Preprocess the given data according to this step."""
         raise NotImplementedError
 
 
@@ -85,7 +91,6 @@ class SubtractAvg(Step):
         if self.fitted:
             raise PreprocessingError('Step already fitted')
 
-
     def _calc_avg(self):
         self._check_not_fitted()
         if self.n == 0:
@@ -105,4 +110,4 @@ class SubtractAvg(Step):
             self.avg = np.zeros(data.shape[1])
         self.avg += np.sum(data, axis=0)
         self.n += data.shape[0]
-        return self.transform(data)
+        return data

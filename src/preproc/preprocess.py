@@ -49,6 +49,9 @@ class Preprocess(object):
     def fit(self, data):
         """Run with training data, allowing steps to learn their parameters.
 
+        After training, the transform method is called with the data and
+        its result is returned.
+
         Raises: preproc.errors.PreprocessingError if the pipeline is
         already fitted.
 
@@ -58,8 +61,10 @@ class Preprocess(object):
         data = np.atleast_2d(data)
         self._check_not_fitted()
         for step in self.steps:
-            data = step.fit(data)
+            step.fit(data)
+            data = step.transform(data)
         self.fitted = True
+        return data
 
     def transform(self, data):
         """Run the pipeline on new data.

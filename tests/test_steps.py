@@ -34,6 +34,8 @@ class TestStep(object):
 
     def test_fitted(self):
         step = steps.SubtractAvg()
-        step.fit([[1, 2, 0], [4, 5, 6]])
+        data = [[1, 2, 0], [4, 5, 6]]
+        step.fit(data)
+        result = step.transform(data)
         with raises(PreprocessingError):
-            step.fit([[1, 2, 0], [4, 5, 6]])
+            step.fit(data)

@@ -41,6 +41,4 @@ class TestPreprocess(object):
             [-0.08900669, -0.0593021 , -0.04320469],
             [-0.11189099, -0.07934285, -0.06090427]
         ])
-        preproc.fit(data)
-        # assert (preproc.transform(data) == expected).all()
-        assert np.allclose(preproc.transform(data), expected)
+        assert np.allclose(preproc.fit(data), expected)
